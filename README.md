@@ -9,7 +9,7 @@ Just type !elminster (or !e for shorts) and a dice roll and I will tell you the 
 It ain't much, but it's honest work.
 
 ### Rolling Dice
-The dice library used is this one. Here are some examples:
+The dice library used is [this one](http://rpg.greenimp.co.uk/dice-roller/). Here are some examples:
 
 * d6 or 1d6 (A 6 sided die)
 * 2d6 (Two 6 sided dice)
