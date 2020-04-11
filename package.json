@@ -5,15 +5,20 @@
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node game.js"
   },
   "author": "Paulo Suderio",
   "license": "MIT",
   "dependencies": {
-    "body-parser": "^1.18.3",
-    "eris": "^0.9.0",
-    "express": "^4.16.4",
+    "@discordjs/opus": "^0.1.0",
+    "bufferutil": "^4.0.1",
+    "discord.js": "^12.1.1",
+    "erlpack": "github:discordapp/erlpack",
+    "inquirer": "^7.1.0",
     "rpg-dice-roller": "^4.0.2",
-    "winston": "^3.2.1"
+    "sodium": "^3.0.2",
+    "utf-8-validate": "^5.0.2",
+    "winston": "^3.2.1",
+    "zlib-sync": "^0.1.6"
   }
 }

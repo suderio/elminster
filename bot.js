@@ -1,9 +1,9 @@
-const eris = require('eris');
+const Discord = require('discord.js');
+const client = new Discord.Client();
 
-const { token } = require('./config.json');
-
-// Create a Client instance with our bot token.
-const bot = new eris.Client(token);
+client.on('ready', () => {
+  console.log(`Logged in as ${client.user.tag}!`);
+});
 
 // Configure logger settings
 var logger = require('winston');
@@ -11,59 +11,42 @@ logger.remove(logger.transports.Console);
 logger.add(new logger.transports.Console, {
     colorize: true
 });
-logger.level = 'warn';
+logger.level = 'debug';
 
+// Configure dice roller
 const rpgDiceRoller = require('rpg-dice-roller/lib/umd/bundle.js');
 const roller = new rpgDiceRoller.DiceRoller();
 
-// When the bot is connected and ready, log to console.
-bot.on('ready', function (evt) {
-    logger.info('Connected');
-});
+// Configure dice sound
+const fs = require('fs');
+const broadcast = client.voice.createBroadcast();
 
-// Every time a message is sent anywhere the bot is present,
-// this event will fire and we will check if the bot was mentioned.
-// If it was, the bot will attempt to respond with "Present".
-bot.on('messageCreate', async (msg) => {
-  const botWasMentioned = msg.mentions.find(
-    mentionedUser => mentionedUser.id === bot.user.id,
-  );
-  if (botWasMentioned) {
-    try {
-      await msg.channel.createMessage('Present');
-    } catch (err) {
-      // There are various reasons why sending a message may fail.
-      // The API might time out or choke and return a 5xx status,
-      // or the bot may not have permission to send the
-      // message (403 status).
-      logger.warn('Failed to respond to mention.');
-      logger.warn(err);
-    }
-  }
-});
 
-bot.on('messageCreate', async (msg) => {
+client.on('message', msg => {
+  logger.debug(msg.content);
   // Our bot needs to know if it will execute a command
   // It will listen for messages starting with `!e`
-  logger.info(msg.content);
-
   const elminsterCalled = msg.content.substring(0, 2) == '!e'
   if (elminsterCalled) {
-    var args = msg.content.split(' ');
-    var cmd = args[1];
-    var roll = roller.roll(cmd);
-    logger.info('result ' + roll);
+    var args = msg.content.slice(msg.content.indexOf(" "));
+    var cmd = args.replace(/\ /g, "").toLowerCase();
     try {
-      await msg.channel.createMessage(`You rolled: ${roll}`)
+      var roll = roller.roll(cmd);
+    } catch {
+      msg.reply('I understand dice rolls and shit, not this nonsense gibberish jibber-jabber gobbledygook');
+      return;
+    }
+    try {
+      // Send the attachment in the message channel
+      const attachment = new Discord.MessageAttachment('./assets/48.png');
+      msg.reply(`you rolled: ${roll}`, attachment);
+      broadcast.play('dice.mp3');
     } catch (err) {
-      logger.warn('I understand dice rolls and shit, not this nonsense gibberish jibber-jabber gobbledygook');
       logger.warn(err);
     }
-  }
+  } 
 });
 
-bot.on('error', err => {
-  logger.warn(err);
-});
+const { token } = require('./config.json');
+client.login(token);
 
-bot.connect();
